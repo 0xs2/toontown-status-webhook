@@ -5,12 +5,28 @@ const { EmbedBuilder, WebhookClient } = require('discord.js');
 
 const moment = require('moment');
 var momentDurationFormatSetup = require("moment-duration-format");
- 
+
 momentDurationFormatSetup(moment);
 
 const axios = require('axios');
 const webhookClient = new WebhookClient({ url: process.env.WEBHOOK_URL });
 const cron = require('node-cron');
+const i = firstRun();
+
+
+cron.schedule('* * * * *', async () => {
+    c(i);
+});
+
+
+async function firstRun() {
+    let i = await webhookClient.send({
+        username: process.env.WEBBOOK_NAME,
+        avatarURL: process.env.WEBBOOK_AVATAR,
+        content: 'TT Status first run please wait a moment...'
+    })
+    return i;
+}
 
 async function request(url) {
     let data = '';
@@ -74,7 +90,7 @@ async function getTTREmbed() {
                 "time": t,
                 "progress": p
             })
- 
+
         });
 
         let builder = [];
@@ -82,7 +98,7 @@ async function getTTREmbed() {
         mainBuilder.forEach(element => {
 
             let cogs = '';
-            if(!element.invasion) { 
+            if(!element.invasion) {
                 cogs = `No Invasion`;
             }
             else {
@@ -99,14 +115,14 @@ async function getTTREmbed() {
         embed2.setFooter({text: `TT Status Webhook By ${process.env.WEBHOOK_AUTHOR}`, iconURL: process.env.WEBHOOK_AUTHOR_AVATAR})
         embed2.setTimestamp();
         embed2.setColor("#1a5493");
-    
+
         embed2.setTitle('Toontown Rewritten Status');
         embed2.addFields(builder);
         embed2.setDescription(`**${main.totalPopulation}** online, **${ins}** Invasions`);
     }
     else {
         embed2.setTitle('Toontown Rewritten Status Error')
-        embed2.setDescription('Error getting status from the API :(')  
+        embed2.setDescription('Error getting status from the API :(')
     }
 
     return embed2;
@@ -123,7 +139,7 @@ async function getCCEmbed() {
     embed.setTimestamp();
     embed.setColor("#f9d805");
 
-    if(data) { 
+    if(data) {
 
         // handle the data stuff
         let online = 0;
@@ -154,7 +170,7 @@ async function getCCEmbed() {
         embed.setTitle('Corporate Clash Status')
         embed.addFields(builder);
         embed.setDescription(`**${online}** online, **${invasions}** Invasions`);
-        
+
     }
     else {
         embed.setTitle('Corporate Clash Status Error')
@@ -164,18 +180,17 @@ async function getCCEmbed() {
     return embed;
 }
 
+async function c(i) {
 
-async function main() {
+    let e = await i;
     let cc = await getCCEmbed();
     let tt = await getTTREmbed();
 
-    webhookClient.edit(process.env.MESSAGE_ID,{
+    webhookClient.editMessage(e.id,{
         username: process.env.WEBBOOK_NAME,
+        content: '',
         avatarURL: process.env.WEBBOOK_AVATAR,
-        embeds: [tt,cc],
+        embeds: [tt,cc]
+
     });
 }
-
-cron.schedule('*/5 * * * *', async () => {
-    main();
-});
