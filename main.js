@@ -5,7 +5,7 @@ const { EmbedBuilder, WebhookClient } = require('discord.js');
 
 const moment = require('moment');
 var momentDurationFormatSetup = require("moment-duration-format");
-
+ 
 momentDurationFormatSetup(moment);
 
 const axios = require('axios');
@@ -31,7 +31,7 @@ async function firstRun() {
 async function request(url) {
     let data = '';
     try {
-    await axios.get(url, {headers: { 'User-Agent':'TT Status Webhook, https://github.com/0xs2/tt-status' }})
+    await axios.get(url, {headers: { 'User-Agent':'TT Status Webhook, https://github.com/0xs2/toontown-status-webhook' }})
         .then(async function (response) {
 
             if (response.status != 200) {
@@ -90,7 +90,7 @@ async function getTTREmbed() {
                 "time": t,
                 "progress": p
             })
-
+ 
         });
 
         let builder = [];
@@ -98,7 +98,7 @@ async function getTTREmbed() {
         mainBuilder.forEach(element => {
 
             let cogs = '';
-            if(!element.invasion) {
+            if(!element.invasion) { 
                 cogs = `No Invasion`;
             }
             else {
@@ -108,21 +108,21 @@ async function getTTREmbed() {
 
 
             builder.push(
-                { name: element.distinct, value: `${cogs}\nStatus: \`${element.status}\`\nPopulation: \`${element.population}\``, inline: true }
+                { name: element.distinct, value: `${cogs}\nStatus: \`${element.status}\`\nPopulation: \`${element.population}\`\n`, inline: true }
             )
         });
         embed2.setThumbnail(process.env.TTR_WEBHOOK_AVATAR)
         embed2.setFooter({text: `TT Status Webhook By ${process.env.WEBHOOK_AUTHOR}`, iconURL: process.env.WEBHOOK_AUTHOR_AVATAR})
         embed2.setTimestamp();
         embed2.setColor("#1a5493");
-
+    
         embed2.setTitle('Toontown Rewritten Status');
         embed2.addFields(builder);
         embed2.setDescription(`**${main.totalPopulation}** online, **${ins}** Invasions`);
     }
     else {
         embed2.setTitle('Toontown Rewritten Status Error')
-        embed2.setDescription('Error getting status from the API :(')
+        embed2.setDescription('Error getting status from the API :(')  
     }
 
     return embed2;
@@ -139,7 +139,7 @@ async function getCCEmbed() {
     embed.setTimestamp();
     embed.setColor("#f9d805");
 
-    if(data) {
+    if(data) { 
 
         // handle the data stuff
         let online = 0;
@@ -155,14 +155,14 @@ async function getCCEmbed() {
                 invasions++;
                 var duration = moment.duration(element.remaining_time, 'seconds');
                 var formatted = duration.format("hh:mm:ss");
-                cogs = `Attacking: \`${element.cogs_attacking}\`\nDefeated: \`${element.count_defeated}\`\nTotal: \`${element.count_total}\`\nRemaining Time: \`${formatted}\``
+                cogs = `Attacking: \`${element.cogs_attacking}\`\nProgress: \`${element.count_defeated}/${element.count_total}\`\nRemaining Time: \`${formatted}\``
             }
             else {
                 cogs = 'No Invasion'
             }
 
             builder.push(
-                { name: element.name, value: `${cogs}\nOnline: \`${element.online}\`\nPopulation: \`${element.population}\``, inline: true }
+                { name: element.name, value: `${cogs}\nOnline: \`${element.online}\`\nPopulation: \`${element.population}\`\n`, inline: true }
             )
 
         })
@@ -170,7 +170,7 @@ async function getCCEmbed() {
         embed.setTitle('Corporate Clash Status')
         embed.addFields(builder);
         embed.setDescription(`**${online}** online, **${invasions}** Invasions`);
-
+        
     }
     else {
         embed.setTitle('Corporate Clash Status Error')
